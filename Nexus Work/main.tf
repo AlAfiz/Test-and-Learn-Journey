@@ -1,20 +1,53 @@
-terraform {
-  required_version = ">= 1.0.0" # Ensure that the Terraform version is 1.0.0 or higher
+#SSH Key
+resource "aws_key_pair" "my_ssh_key" {
+  key_name = "Zacks-Key-Nexus"
+  public_key = file("C:/Users/Public/id_nexus.pub")
+}
 
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws" # Specify the source of the AWS provider
-      version = "~> 4.0"        # Use a version of the AWS provider that is compatible with version
-    }
+#Firewalls
+#Allow ssh
+resource "aws_security_group" "allow_ssh" {
+  name = "allow_ssh_traffic"
+  description = "Allow SSH Connection"
+
+  #INBOUND RULES
+  #SSH
+  ingress {
+    from_port = 22
+    to_port = 22
+    protocol = "tcp"
+    cidr_blocks = var.cidr_block
+  }
+
+  #Application Access
+  ingress {
+    from_port = 8081
+    to_port = 8081
+    protocol = "tcp"
+    cidr_blocks = var.cidr_block
+  }
+
+  egress {
+    from_port = 0
+    to_port = 0
+    protocol = "-1"
+    cidr_blocks = var.cidr_block
   }
 }
 
-provider "aws" {
-  region = "us-east-1" # Set the AWS region to US East (N. Virginia)
-}
+#EC2 instance
+resource "aws_instance" "Nexus_Server" {
+  ami = var.ami_id
+  instance_type = var.instance_type
+  key_name = aws_key_pair.my_ssh_key.key_name
 
-resource "aws_instance" "aws_example" {
+  vpc_security_group_ids = [aws_security_group.allow_ssh.id]
+
   tags = {
-    Name = "ExampleInstance" # Tag the instance with a Name tag for easier identification
+    Name = "My-Server-For-Nexus"
   }
+}
+
+output "server_ip" {
+  value = aws_instance.Nexus_Server.public_ip
 }
