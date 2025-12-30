@@ -1,0 +1,10 @@
+**/.terraform/
+.terraform.lock.hcl
+.terraform.tf
+*.terraform.tfstate
+*.terraform.tfstate.backup
+
+.idea
+
+id_aws
+id_aws.pub
