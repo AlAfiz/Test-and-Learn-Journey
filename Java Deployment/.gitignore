@@ -1,0 +1,6 @@
+# This creates the file and adds the patterns to ignore
+echo "terraform.tfstate" >> .gitignore
+echo "terraform.tfstate.backup" >> .gitignore
+echo ".terraform/" >> .gitignore
+echo "*.tfvars" >> .gitignore
+echo "id_aws" >> .gitignore

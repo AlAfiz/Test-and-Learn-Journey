@@ -1,0 +1,90 @@
+<html lang="en">
+<head>
+    <style>
+        .container-edit { display: none; }
+        .container, .container-edit { font-family: sans-serif; margin: 20px; }
+        img { width: 150px; border-radius: 50%; }
+    </style>
+</head>
+<body>
+   <div class='container'>
+        <h1 class='header'>User Profile</h1>
+        <img src='me.jpeg' alt="Profile Pic">
+        <h3>Name:  <span id='name'>Zack DevOps</span></h3>
+        <hr />
+        <h3>Email: <span id='email'>test@example.com</span></h3>
+        <hr />
+       <h3>Interests: <span id='interests'>coding</span></h3>
+        <hr />
+        <button class='button' onclick="editProfile()">Edit Profile</button>
+   </div>
+   <div class='container-edit'>
+       <h1 class='header'>User Profile</h1>
+       <img src='me.jpeg' alt="Profile Pic">
+       <label for="input-name">Name:</label>
+       <input id="input-name" type='text' />
+       <hr />
+
+       <label for="input-email">Email:</label>
+       <input id="input-email" type='email' />
+       <hr />
+
+       <label for="input-interests">Interests:</label>
+       <input id="input-interests" type='text' />
+       <hr />
+
+       <button class='button' onclick="saveProfile()">Save Profile</button>
+   </div>
+
+<script>
+    function editProfile() {
+        document.querySelector('.container').style.display = 'none';
+        document.querySelector('.container-edit').style.display = 'block';
+
+        document.querySelector('#input-name').value = document.querySelector('#name').textContent;
+        document.querySelector('#input-email').value = document.querySelector('#email').textContent;
+        document.querySelector('#input-interests').value = document.querySelector('#interests').textContent;
+    }
+
+    function saveProfile() {
+        const name = document.querySelector('#input-name').value;
+        const email = document.querySelector('#input-email').value;
+        const interests = document.querySelector('#input-interests').value;
+
+        // Optimistic UI update
+        document.querySelector('#name').textContent = name;
+        document.querySelector('#email').textContent = email;
+        document.querySelector('#interests').textContent = interests;
+
+        fetch('/update-profile', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, email, interests })
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert('Profile saved successfully!');
+        })
+        .catch(error => {
+            alert('Error saving profile!');
+        });
+
+        document.querySelector('.container').style.display = 'block';
+        document.querySelector('.container-edit').style.display = 'none';
+    }
+
+    // Auto-load data on refresh
+    (function init() {
+        fetch('/get-profile')
+            .then(response => response.json())
+            .then(data => {
+                if (data && data.name) {
+                    document.querySelector('#name').textContent = data.name;
+                    document.querySelector('#email').textContent = data.email;
+                    document.querySelector('#interests').textContent = data.interests;
+                }
+            });
+    })();
+</script>
+</body>
+</html>
