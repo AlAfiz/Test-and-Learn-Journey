@@ -1,3 +1,14 @@
+terraform {
+  backend "s3" {
+    bucket         = "zakari-tf-state-2026"
+    key            = "devops-tracker/terraform.tfstate"
+    region         = "us-east-1"
+    use_lockfile   = true
+    encrypt        = true
+  }
+}
+
+
 resource "aws_key_pair" "tracker_key" {
   key_name   = "devops_tracker"
   public_key = file("~/.ssh/devops_tracker.pub")
